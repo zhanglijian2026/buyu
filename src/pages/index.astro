@@ -1,0 +1,148 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<style>
+			main {
+				padding-top: 6em;
+				padding-bottom: 6em;
+			}
+			.hero {
+				text-align: center;
+			}
+			.hero h1 {
+				font-size: 3.2em;
+				margin-bottom: 0.3em;
+				background: var(--accent-gradient);
+				-webkit-background-clip: text;
+				background-clip: text;
+				color: transparent;
+				line-height: 1.2;
+			}
+			.hero .tagline {
+				font-size: 1.25em;
+				color: var(--text);
+				margin-bottom: 2.5em;
+			}
+			.cursor::after {
+				content: '▍';
+				color: var(--accent);
+				animation: blink 1.2s step-end infinite;
+			}
+			@keyframes blink {
+				50% {
+					opacity: 0;
+				}
+			}
+			.cta {
+				display: inline-flex;
+				gap: 1em;
+				flex-wrap: wrap;
+				justify-content: center;
+			}
+			.btn {
+				display: inline-block;
+				padding: 0.7em 1.8em;
+				border-radius: 999px;
+				text-decoration: none;
+				font-weight: 600;
+				transition: 0.25s ease;
+				border: 1px solid var(--border-strong);
+				color: var(--text-bright);
+			}
+			.btn:hover {
+				border-color: var(--accent);
+				box-shadow: var(--glow);
+				transform: translateY(-2px);
+				color: var(--accent);
+				text-shadow: none;
+			}
+			.btn.primary {
+				background: var(--accent-gradient);
+				color: #041018;
+				border: none;
+			}
+			.btn.primary:hover {
+				filter: brightness(1.15);
+				color: #041018;
+				box-shadow: 0 0 28px rgba(0, 240, 255, 0.35);
+			}
+			.terminal {
+				margin: 4em auto 0;
+				max-width: 560px;
+				text-align: left;
+				background: #0d1220;
+				border: 1px solid var(--border);
+				border-radius: 12px;
+				box-shadow: var(--box-shadow);
+				overflow: hidden;
+			}
+			.terminal .bar {
+				display: flex;
+				gap: 6px;
+				padding: 10px 14px;
+				background: var(--bg-elevated);
+				border-bottom: 1px solid var(--border);
+			}
+			.terminal .bar span {
+				width: 12px;
+				height: 12px;
+				border-radius: 50%;
+			}
+			.terminal .bar span:nth-child(1) {
+				background: #ff5f57;
+			}
+			.terminal .bar span:nth-child(2) {
+				background: #febc2e;
+			}
+			.terminal .bar span:nth-child(3) {
+				background: #28c840;
+			}
+			.terminal pre {
+				margin: 0;
+				padding: 1.2em 1.5em;
+				background: transparent !important;
+				border: none;
+				box-shadow: none;
+				color: var(--text);
+				font-size: 0.95em;
+			}
+			.terminal .prompt {
+				color: var(--accent);
+			}
+			.terminal .output {
+				color: var(--text-dim);
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section class="hero">
+				<h1>不语</h1>
+				<p class="tagline cursor">技术折腾与生活记录，都写在这里。</p>
+				<div class="cta">
+					<a class="btn primary" href="/blog">进入博客 →</a>
+					<a class="btn" href="/about">关于我</a>
+				</div>
+				<div class="terminal">
+					<div class="bar"><span></span><span></span><span></span></div>
+					<pre><span class="prompt">~ $</span> whoami
+<span class="output">耳隆</span>
+<span class="prompt">~ $</span> cat mission.txt
+<span class="output">写代码，过生活，偶尔记录。</span>
+<span class="prompt">~ $</span> npm run blog -- --mode=quiet
+<span class="output">✔ 构建完成，欢迎。</span></pre>
+				</div>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
