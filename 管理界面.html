@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>不语 - 文章管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: #0a0e17;
+            color: #c9d4e3;
+            min-height: 100vh;
+            padding: 2em;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 0.5em;
+            background: linear-gradient(120deg, #00f0ff, #b026ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .subtitle {
+            color: #6b7a90;
+            margin-bottom: 2em;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2em;
+        }
+        .sidebar {
+            background: rgba(22, 30, 48, 0.6);
+            border: 1px solid rgba(0, 240, 255, 0.12);
+            border-radius: 12px;
+            padding: 1.5em;
+        }
+        .sidebar h2 {
+            color: #eef3fa;
+            margin-bottom: 1em;
+            font-size: 1.2em;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 0.8em 1.2em;
+            margin-bottom: 0.8em;
+            background: transparent;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 8px;
+            color: #c9d4e3;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            text-decoration: none;
+        }
+        .btn:hover {
+            border-color: #00f0ff;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+        }
+        .btn.primary {
+            background: linear-gradient(120deg, #00f0ff, #b026ff);
+            color: #041018;
+            border: none;
+            font-weight: 600;
+        }
+        .btn.primary:hover {
+            filter: brightness(1.15);
+        }
+        .main {
+            background: rgba(22, 30, 48, 0.6);
+            border: 1px solid rgba(0, 240, 255, 0.12);
+            border-radius: 12px;
+            padding: 1.5em;
+        }
+        .form-group {
+            margin-bottom: 1.5em;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5em;
+            color: #eef3fa;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8em;
+            background: #0d1220;
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 8px;
+            color: #c9d4e3;
+            font-family: inherit;
+            font-size: 1em;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #00f0ff;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+        }
+        .form-group textarea {
+            min-height: 400px;
+            resize: vertical;
+            font-family: 'Cascadia Code', Consolas, monospace;
+            line-height: 1.6;
+        }
+        .hint {
+            color: #6b7a90;
+            font-size: 0.9em;
+            margin-top: 0.5em;
+        }
+        .actions {
+            display: flex;
+            gap: 1em;
+            margin-top: 2em;
+        }
+        .actions .btn {
+            width: auto;
+            padding: 0.8em 2em;
+        }
+        .preview {
+            margin-top: 2em;
+            padding: 1.5em;
+            background: #0d1220;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 240, 255, 0.1);
+        }
+        .preview h3 {
+            color: #00f0ff;
+            margin-bottom: 1em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1em;
+        }
+        th, td {
+            padding: 0.8em;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+        }
+        th {
+            color: #00f0ff;
+        }
+        td a {
+            color: #00f0ff;
+            text-decoration: none;
+        }
+        td a:hover {
+            text-decoration: underline;
+        }
+        .status {
+            padding: 1em;
+            border-radius: 8px;
+            margin-bottom: 1em;
+        }
+        .status.success {
+            background: rgba(40, 200, 64, 0.1);
+            border: 1px solid rgba(40, 200, 64, 0.3);
+            color: #28c840;
+        }
+        .status.error {
+            background: rgba(255, 95, 87, 0.1);
+            border: 1px solid rgba(255, 95, 87, 0.3);
+            color: #ff5f57;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>不语</h1>
+        <p class="subtitle">文章管理系统 - 本地版</p>
+        
+        <div class="grid">
+            <div class="sidebar">
+                <h2>📁 操作</h2>
+                <button class="btn primary" onclick="newPost()">+ 新建文章</button>
+                <button class="btn" onclick="showPosts()">📄 文章列表</button>
+                <button class="btn" onclick="showHelp()">❓ 使用帮助</button>
+                <button class="btn" onclick="openBlog()">🌐 打开博客</button>
+                <hr style="border-color: rgba(0,240,255,0.1); margin: 1.5em 0;">
+                <h2>⚡ 快捷命令</h2>
+                <div class="hint">
+                    构建: npm run build<br>
+                    预览: npm run dev<br>
+                    文章目录: src/content/blog/
+                </div>
+            </div>
+            
+            <div class="main" id="main-content">
+                <div class="form-group">
+                    <label>文章标题</label>
+                    <input type="text" id="title" placeholder="输入文章标题...">
+                </div>
+                <div class="form-group">
+                    <label>文章描述</label>
+                    <input type="text" id="description" placeholder="简短描述文章内容...">
+                </div>
+                <div class="form-group">
+                    <label>文章内容 (Markdown)</label>
+                    <textarea id="content" placeholder="在这里写 Markdown 内容...
+
+示例格式:
+---
+title: '文章标题'
+description: '描述'
+pubDate: 2026-08-30
+---
+
+这里是正文内容...
+
+## 二级标题
+
+- 列表项1
+- 列表项2
+
+**加粗文字**
+
+[链接文字](https://example.com)"></textarea>
+                    <div class="hint">支持标准 Markdown 语法，使用 --- 包裹 frontmatter</div>
+                </div>
+                <div class="actions">
+                    <button class="btn primary" onclick="savePost()">💾 保存文章</button>
+                    <button class="btn" onclick="previewPost()">👁️ 预览</button>
+                    <button class="btn" onclick="clearForm()">🗑️ 清空</button>
+                </div>
+                <div id="status"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 这里只是前端界面，实际保存需要后端支持
+        // 目前提供文章模板和格式检查
+        
+        function newPost() {
+            clearForm();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('content').value = `---
+title: ''
+description: ''
+pubDate: ${today}
+---
+
+在这里开始写作...
+`;
+        }
+        
+        function clearForm() {
+            document.getElementById('title').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('content').value = '';
+            document.getElementById('status').innerHTML = '';
+        }
+        
+        function previewPost() {
+            const content = document.getElementById('content').value;
+            if (!content.trim()) {
+                showStatus('请先输入内容', 'error');
+                return;
+            }
+            // 简单的 Markdown 预览（实际项目中可以用 marked.js）
+            showStatus('预览功能需要配置 Markdown 渲染器', 'error');
+        }
+        
+        function savePost() {
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const content = document.getElementById('content').value;
+            
+            if (!title.trim()) {
+                showStatus('请输入文章标题', 'error');
+                return;
+            }
+            if (!content.trim()) {
+                showStatus('请输入文章内容', 'error');
+                return;
+            }
+            
+            // 生成文件名
+            const filename = title.replace(/[^\w\u4e00-\u9fa5]/g, '-').toLowerCase() + '.md';
+            
+            // 显示保存信息（实际保存需要后端）
+            showStatus(`文章已准备好！<br>文件名: ${filename}<br><br>请手动保存到: E:\\不语\\src\\content\\blog\\${filename}<br><br>然后运行: npm run build`, 'success');
+            
+            // 复制内容到剪贴板
+            navigator.clipboard.writeText(content).then(() => {
+                console.log('内容已复制到剪贴板');
+            });
+        }
+        
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.className = `status ${type}`;
+            status.innerHTML = message;
+        }
+        
+        function showPosts() {
+            document.getElementById('main-content').innerHTML = `
+                <h3>📄 文章列表</h3>
+                <p class="hint">请查看文件夹: E:\\不语\\src\\content\\blog\\</p>
+                <p class="hint">或使用 VS Code 打开项目查看</p>
+            `;
+        }
+        
+        function showHelp() {
+            document.getElementById('main-content').innerHTML = `
+                <h3>❓ 使用帮助</h3>
+                <div class="hint">
+                    <h4>写作流程:</h4>
+                    <ol style="margin-left: 1.5em; line-height: 2;">
+                        <li>点击"新建文章"开始写作</li>
+                        <li>填写标题、描述和内容</li>
+                        <li>点击"保存文章"复制内容</li>
+                        <li>在 E:\\不语\\src\\content\\blog\\ 创建 .md 文件</li>
+                        <li>粘贴内容并保存</li>
+                        <li>运行 npm run build 重新构建</li>
+                        <li>刷新 http://localhost:8080 查看</li>
+                    </ol>
+                    <h4>Markdown 语法:</h4>
+                    <ul style="margin-left: 1.5em; line-height: 2;">
+                        <li># 一级标题, ## 二级标题</li>
+                        <li>**加粗**, *斜体*</li>
+                        <li>[链接](url), ![图片](url)</li>
+                        <li>\`代码\`, \`\`\`代码块\`\`\`</li>
+                        <li>- 列表项, 1. 有序列表</li>
+                    </ul>
+                </div>
+            `;
+        }
+        
+        function openBlog() {
+            window.open('http://localhost:8080', '_blank');
+        }
+        
+        // 初始化
+        newPost();
+    </script>
+</body>
+</html>
