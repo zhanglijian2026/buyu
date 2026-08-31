@@ -1,0 +1,178 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title="生活圈" description="不语的生活圈：每天的状态都记录在这里。" />
+		<style>
+			main {
+				width: 720px;
+				max-width: calc(100% - 2em);
+				margin: auto;
+				padding: 4em 0 6em;
+			}
+			h1 {
+				text-align: center;
+				font-size: 2.2em;
+				margin-bottom: 0.3em;
+				background: var(--accent-gradient);
+				-webkit-background-clip: text;
+				background-clip: text;
+				color: transparent;
+			}
+			.subtitle {
+				text-align: center;
+				color: var(--text-dim);
+				margin-bottom: 2.5em;
+				font-size: 0.95em;
+			}
+			/* 密码门 */
+			.gate {
+				max-width: 380px;
+				margin: 2em auto;
+				background: #0d1220;
+				border: 1px solid var(--border);
+				border-radius: 14px;
+				padding: 2.4em 2em;
+				text-align: center;
+				box-shadow: var(--box-shadow);
+			}
+			.gate .lock-icon { font-size: 2.4em; margin-bottom: 0.5em; }
+			.gate input {
+				width: 100%;
+				padding: 0.8em;
+				background: var(--bg-elevated);
+				border: 1px solid var(--border-strong);
+				border-radius: 8px;
+				color: var(--text-bright);
+				font-size: 1.4em;
+				text-align: center;
+				letter-spacing: 0.5em;
+				margin-bottom: 0.3em;
+				outline: none;
+			}
+			.gate input:focus { border-color: var(--accent); box-shadow: 0 0 12px rgba(0, 240, 255, 0.2); }
+			.gate .hint { color: var(--text-dim); font-size: 0.85em; margin-top: 1em; }
+			.gate .error { color: #ff5f57; font-size: 0.85em; margin-top: 0.8em; min-height: 1.2em; }
+			.btn {
+				display: inline-block;
+				margin-top: 1.2em;
+				padding: 0.6em 2.2em;
+				border-radius: 999px;
+				border: none;
+				background: var(--accent-gradient);
+				color: #041018;
+				font-weight: 600;
+				cursor: pointer;
+				transition: 0.2s;
+				font-size: 0.95em;
+			}
+			.btn:hover { filter: brightness(1.15); }
+			/* 状态流 */
+			.status-item {
+				background: #0d1220;
+				border: 1px solid var(--border);
+				border-radius: 12px;
+				padding: 1.2em 1.4em;
+				margin-bottom: 1em;
+				box-shadow: var(--box-shadow);
+			}
+			.status-item .meta {
+				color: var(--text-dim);
+				font-size: 0.8em;
+				margin-bottom: 0.6em;
+				display: flex;
+				justify-content: space-between;
+			}
+			.status-item .content { color: var(--text); line-height: 1.7; }
+			.empty { text-align: center; color: var(--text-dim); padding: 3em 0; }
+			.back { text-align: center; margin-top: 2em; font-size: 0.9em; }
+			.back a { color: var(--accent); text-decoration: none; }
+			.back a:hover { text-decoration: underline; }
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1>🔒 生活圈</h1>
+			<p class="subtitle">耳隆的日常碎片，每天的状态都记在这里。</p>
+
+			<div id="gate">
+				<div class="gate">
+					<div class="lock-icon">🔐</div>
+					<p style="color: var(--text); margin-bottom: 1.2em;">此区域需要密码才能进入</p>
+					<input type="password" id="pwd" placeholder="****" maxlength="4"
+						onkeydown="if(event.key==='Enter')unlock()" autocomplete="off" />
+					<div class="error" id="pwd-error"></div>
+					<button class="btn" onclick="unlock()">🔓 进入生活圈</button>
+					<div class="hint">💡 提示：密码是作者的生日</div>
+				</div>
+			</div>
+
+			<div id="content" style="display:none;">
+				<div id="status-flow">
+					<div class="empty">加载中...</div>
+				</div>
+				<div class="back"><a href="/buyu/">← 返回首页</a></div>
+			</div>
+		</main>
+		<Footer />
+
+		<script is:inline>
+			const PASSWORD = '0804'; // 作者生日
+
+			function unlock() {
+				const v = document.getElementById('pwd').value.trim();
+				if (v === PASSWORD) {
+					sessionStorage.setItem('life_ok', '1');
+					enter();
+				} else {
+					document.getElementById('pwd-error').textContent = '密码不对哦，再想想～';
+				}
+			}
+
+			function enter() {
+				document.getElementById('gate').style.display = 'none';
+				document.getElementById('content').style.display = 'block';
+				loadStatuses();
+			}
+
+			function loadStatuses() {
+				const el = document.getElementById('status-flow');
+				fetch('/buyu/status.json')
+					.then(r => r.json())
+					.then(d => {
+						const list = (d.statuses || []).slice().reverse();
+						if (!list.length) {
+							el.innerHTML = '<div class="empty">生活圈还空空如也，等着主人的第一条状态。</div>';
+							return;
+						}
+						el.innerHTML = '';
+						list.forEach(s => {
+							const item = document.createElement('div');
+							item.className = 'status-item';
+							item.innerHTML = '<div class="meta"><span>' + s.date + ' ' + (s.time || '') +
+								'</span><span>📍 {SITE_TITLE}</span></div>' +
+								'<div class="content">' + (s.content || '').replace(/</g, '&lt;') + '</div>';
+							el.appendChild(item);
+						});
+					})
+					.catch(() => {
+						el.innerHTML = '<div class="empty">加载失败，请稍后再试。</div>';
+					});
+			}
+
+			// 已解锁过则直接进入
+			if (sessionStorage.getItem('life_ok') === '1') {
+				enter();
+			} else {
+				document.getElementById('pwd').focus();
+			}
+		</script>
+	</body>
+</html>

@@ -56,6 +56,18 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 			.prose :global(a) {
 				color: var(--accent);
 			}
+			.comments {
+				width: 720px;
+				max-width: calc(100% - 2em);
+				margin: 2.5em auto;
+				padding: 0 1em;
+			}
+			.comments-title {
+				text-align: center;
+				color: var(--text-dim);
+				margin-bottom: 1em;
+				font-size: 1.05em;
+			}
 		</style>
 	</head>
 
@@ -82,6 +94,16 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 						<hr />
 					</div>
 					<slot />
+				</div>
+				<div class="comments">
+					<div class="comments-title">💬 评论</div>
+					<script is:inline src="https://utteranc.es/client.js"
+						repo="zhanglijian2026/buyu"
+						issue-term="pathname"
+						label="comment"
+						theme="dark-blue"
+						crossorigin="anonymous"
+						async></script>
 				</div>
 			</article>
 		</main>
