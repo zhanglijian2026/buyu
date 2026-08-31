@@ -1,6 +1,6 @@
 ---
-title: '不语开张：为什么我选 Astro 写博客'
-description: '第一篇：记录搭建这个博客的原因与技术选型。'
+title: "不语开张：为什么我选 Astro 写博客"
+description: "第一篇：记录搭建这个博客的原因与技术选型。"
 pubDate: 2026-08-30
 ---
 
