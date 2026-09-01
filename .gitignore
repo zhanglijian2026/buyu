@@ -23,5 +23,9 @@ pnpm-debug.log*
 # python cache
 __pycache__/
 
+# 本地管理工具（不推送到 GitHub）
+管理后端.py
+日记/
+
 # jetbrains setting folder
 .idea/
