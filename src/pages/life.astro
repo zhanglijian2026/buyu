@@ -90,6 +90,20 @@ import { SITE_TITLE } from '../consts';
 				justify-content: space-between;
 			}
 			.status-item .content { color: var(--text); line-height: 1.7; }
+		.status-item .status-imgs { display: flex; flex-wrap: wrap; gap: 0.6em; margin-top: 0.8em; }
+		.status-item .status-imgs img {
+			width: 120px; height: 120px; object-fit: cover; border-radius: 10px;
+			border: 1px solid rgba(0, 240, 255, 0.15); cursor: pointer;
+			transition: transform 0.2s;
+		}
+		.status-item .status-imgs img:hover { transform: scale(1.05); }
+		/* 灯箱 */
+		.lightbox {
+			position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 999;
+			display: none; align-items: center; justify-content: center; cursor: zoom-out;
+		}
+		.lightbox img { max-width: 92vw; max-height: 92vh; border-radius: 10px; }
+		.lightbox.show { display: flex; }
 			.empty { text-align: center; color: var(--text-dim); padding: 3em 0; }
 			.back { text-align: center; margin-top: 2em; font-size: 0.9em; }
 			.back a { color: var(--accent); text-decoration: none; }
@@ -121,6 +135,7 @@ import { SITE_TITLE } from '../consts';
 				<div class="back"><a href="/buyu/">← 返回首页</a></div>
 			</div>
 		</main>
+		<div class="lightbox" id="lightbox" onclick="this.classList.remove('show')"><img id="lightbox-img" src="" alt=""></div>
 		<Footer />
 
 		<script is:inline>
@@ -142,6 +157,11 @@ import { SITE_TITLE } from '../consts';
 				loadStatuses();
 			}
 
+			function openLightbox(src) {
+				document.getElementById('lightbox-img').src = src;
+				document.getElementById('lightbox').classList.add('show');
+			}
+
 			function loadStatuses() {
 				const el = document.getElementById('status-flow');
 				fetch('/buyu/status.json')
@@ -156,9 +176,14 @@ import { SITE_TITLE } from '../consts';
 						list.forEach(s => {
 							const item = document.createElement('div');
 							item.className = 'status-item';
+							let imgs = '';
+							if (s.images && s.images.length) {
+								imgs = '<div class="status-imgs">' + s.images.map(u =>
+									'<img loading="lazy" src="' + u + '" alt="状态图片" onclick="openLightbox(\'' + u + '\')">').join('') + '</div>';
+							}
 							item.innerHTML = '<div class="meta"><span>' + s.date + ' ' + (s.time || '') +
 								'</span><span>📍 {SITE_TITLE}</span></div>' +
-								'<div class="content">' + (s.content || '').replace(/</g, '&lt;') + '</div>';
+								'<div class="content">' + (s.content || '').replace(/</g, '&lt;') + '</div>' + imgs;
 							el.appendChild(item);
 						});
 					})

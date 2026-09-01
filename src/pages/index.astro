@@ -245,8 +245,9 @@ import { SITE_DESCRIPTION, SITE_TITLE, SITE_CITY, SITE_COORDS, SITE_START_DATE, 
 			setInterval(tick, 1000);
 
 			// ===== 网站存在天数 =====
+			// 注意: is:inline 脚本不会经过 Astro 插值，日期必须硬编码（与 src/consts.ts 的 SITE_START_DATE 保持一致）
 			(function () {
-				const start = new Date('{SITE_START_DATE}');
+				const start = new Date('2026-08-30');
 				const today = new Date();
 				const days = Math.floor((today - start) / 86400000) + 1;
 				document.getElementById('days').textContent = '不语已陪伴 ' + days + ' 天';
@@ -310,8 +311,15 @@ import { SITE_DESCRIPTION, SITE_TITLE, SITE_CITY, SITE_COORDS, SITE_START_DATE, 
 						list.forEach(s => {
 							const item = document.createElement('div');
 							item.className = 'item';
+							let imgs = '';
+							if (s.images && s.images.length) {
+								imgs = '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">' +
+									s.images.map(u =>
+										'<img loading="lazy" src="' + u + '" style="width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid rgba(0,240,255,0.15);cursor:pointer;" onclick="window.open(\'' + u + '\')">'
+									).join('') + '</div>';
+							}
 							item.innerHTML = '<div class="meta">' + s.date + ' ' + s.time + '</div><div>' +
-								s.content.replace(/</g, '&lt;') + '</div>';
+								s.content.replace(/</g, '&lt;') + '</div>' + imgs;
 							el.appendChild(item);
 						});
 					})

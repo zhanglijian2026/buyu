@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>不语 - 文章管理</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
             background: #0a0e17;
@@ -17,333 +13,783 @@
             min-height: 100vh;
             padding: 2em;
         }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+        .container { max-width: 1200px; margin: 0 auto; }
         h1 {
             font-size: 2.5em;
-            margin-bottom: 0.5em;
+            margin-bottom: 0.2em;
             background: linear-gradient(120deg, #00f0ff, #b026ff);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
         }
-        .subtitle {
-            color: #6b7a90;
-            margin-bottom: 2em;
+        .subtitle { color: #6b7a90; margin-bottom: 1.5em; }
+        .topbar {
+            display: flex; align-items: center; gap: 1em;
+            margin-bottom: 1.5em; flex-wrap: wrap;
         }
-        .grid {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 2em;
+        .badge {
+            padding: 0.3em 0.9em; border-radius: 20px; font-size: 0.85em;
+            border: 1px solid rgba(0,240,255,0.3); color: #00f0ff;
         }
+        .badge.offline { border-color: rgba(255,95,87,0.4); color: #ff5f57; }
+        .badge a { color: inherit; text-decoration: none; }
+        .grid { display: grid; grid-template-columns: 300px 1fr; gap: 2em; }
         .sidebar {
-            background: rgba(22, 30, 48, 0.6);
-            border: 1px solid rgba(0, 240, 255, 0.12);
-            border-radius: 12px;
-            padding: 1.5em;
+            background: rgba(22,30,48,0.6);
+            border: 1px solid rgba(0,240,255,0.12);
+            border-radius: 12px; padding: 1.5em;
         }
-        .sidebar h2 {
-            color: #eef3fa;
-            margin-bottom: 1em;
-            font-size: 1.2em;
-        }
+        .sidebar h2 { color: #eef3fa; margin-bottom: 1em; font-size: 1.1em; }
         .btn {
-            display: block;
-            width: 100%;
-            padding: 0.8em 1.2em;
-            margin-bottom: 0.8em;
-            background: transparent;
-            border: 1px solid rgba(0, 240, 255, 0.3);
-            border-radius: 8px;
-            color: #c9d4e3;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-            text-decoration: none;
+            display: block; width: 100%; padding: 0.8em 1.2em; margin-bottom: 0.8em;
+            background: transparent; border: 1px solid rgba(0,240,255,0.3);
+            border-radius: 8px; color: #c9d4e3; cursor: pointer;
+            transition: all 0.2s; text-align: center; text-decoration: none;
+            font-size: 0.95em;
         }
-        .btn:hover {
-            border-color: #00f0ff;
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
-        }
+        .btn:hover { border-color: #00f0ff; box-shadow: 0 0 20px rgba(0,240,255,0.15); }
         .btn.primary {
             background: linear-gradient(120deg, #00f0ff, #b026ff);
-            color: #041018;
-            border: none;
-            font-weight: 600;
+            color: #041018; border: none; font-weight: 600;
         }
-        .btn.primary:hover {
-            filter: brightness(1.15);
+        .btn.primary:hover { filter: brightness(1.15); }
+        .btn.publish {
+            background: linear-gradient(120deg, #28c840, #00b894);
+            color: #041018; border: none; font-weight: 600;
         }
+        .btn.publish:hover { filter: brightness(1.15); }
+        .btn.diary { background: linear-gradient(120deg, #febc2e, #ff7e5f); color: #041018; border: none; font-weight: 600; }
+        .btn.diary:hover { filter: brightness(1.15); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
         .main {
-            background: rgba(22, 30, 48, 0.6);
-            border: 1px solid rgba(0, 240, 255, 0.12);
-            border-radius: 12px;
-            padding: 1.5em;
+            background: rgba(22,30,48,0.6);
+            border: 1px solid rgba(0,240,255,0.12);
+            border-radius: 12px; padding: 1.5em;
         }
-        .form-group {
-            margin-bottom: 1.5em;
+        .form-group { margin-bottom: 1.2em; }
+        .form-group label { display: block; margin-bottom: 0.5em; color: #eef3fa; }
+        .form-group input, .form-group textarea {
+            width: 100%; padding: 0.8em;
+            background: #0d1220; border: 1px solid rgba(0,240,255,0.2);
+            border-radius: 8px; color: #c9d4e3; font-family: inherit; font-size: 1em;
         }
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5em;
-            color: #eef3fa;
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none; border-color: #00f0ff;
+            box-shadow: 0 0 10px rgba(0,240,255,0.2);
         }
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.8em;
-            background: #0d1220;
-            border: 1px solid rgba(0, 240, 255, 0.2);
-            border-radius: 8px;
-            color: #c9d4e3;
-            font-family: inherit;
-            font-size: 1em;
+        .form-group textarea { min-height: 380px; resize: vertical; line-height: 1.7; }
+        .form-group textarea.short { min-height: 100px; }
+        .form-row { display: flex; gap: 1em; }
+        .form-row .form-group { flex: 1; }
+        .actions { display: flex; gap: 1em; margin-top: 1.2em; }
+        .actions .btn { width: auto; padding: 0.8em 2em; margin-bottom: 0; }
+        .status { padding: 1em; border-radius: 8px; margin-top: 1.2em; font-size: 0.95em; display: none; }
+        .status.success { display: block; background: rgba(40,200,64,0.1); border: 1px solid rgba(40,200,64,0.3); color: #28c840; }
+        .status.error { display: block; background: rgba(255,95,87,0.1); border: 1px solid rgba(255,95,87,0.3); color: #ff5f57; }
+        .status.info { display: block; background: rgba(0,240,255,0.08); border: 1px solid rgba(0,240,255,0.25); color: #00f0ff; }
+        .status pre { white-space: pre-wrap; font-size: 0.85em; margin-top: 0.6em; color: #8fa3bd; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1em; }
+        th, td { padding: 0.8em; text-align: left; border-bottom: 1px solid rgba(0,240,255,0.1); font-size: 0.92em; }
+        th { color: #00f0ff; }
+        td a { color: #00f0ff; text-decoration: none; }
+        td a:hover { text-decoration: underline; }
+        .op-btn {
+            background: transparent; border: 1px solid rgba(0,240,255,0.3);
+            color: #c9d4e3; border-radius: 6px; padding: 0.3em 0.8em;
+            cursor: pointer; font-size: 0.85em; margin-right: 0.4em;
         }
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #00f0ff;
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+        .op-btn:hover { border-color: #00f0ff; }
+        .op-btn.pub { border-color: rgba(40,200,64,0.4); color: #28c840; }
+        .op-btn.pub:hover { border-color: #28c840; }
+        .op-btn.del { border-color: rgba(255,95,87,0.4); color: #ff5f57; }
+        .op-btn.del:hover { border-color: #ff5f57; }
+        .empty { color: #6b7a90; text-align: center; padding: 3em 0; }
+        .hint { color: #6b7a90; font-size: 0.88em; margin-top: 0.4em; }
+        .hidden { display: none; }
+        .view-title { color: #00f0ff; font-size: 1.2em; margin-bottom: 1em; }
+        .status-item {
+            padding: 0.9em 1em; margin-bottom: 0.8em;
+            background: #0d1220; border: 1px solid rgba(0,240,255,0.12);
+            border-radius: 10px;
         }
-        .form-group textarea {
-            min-height: 400px;
-            resize: vertical;
-            font-family: 'Cascadia Code', Consolas, monospace;
-            line-height: 1.6;
+        .status-item .meta { color: #6b7a90; font-size: 0.82em; margin-bottom: 0.4em; }
+        .pwd-box { text-align: center; padding: 2em; }
+        .pwd-box input { max-width: 260px; margin: 0 auto 1em; text-align: center; letter-spacing: 0.4em; font-size: 1.3em; }
+        .pwd-box .btn { width: 200px; margin: 0 auto; }
+        .diary-list { margin-top: 1.5em; }
+        .diary-list table td { cursor: pointer; }
+        /* 图片上传 */
+        .img-picker { display: flex; align-items: center; gap: 0.8em; flex-wrap: wrap; margin-top: 0.6em; }
+        .img-picker input[type="file"] { display: none; }
+        .img-btn {
+            display: inline-block; padding: 0.55em 1.2em;
+            background: transparent; border: 1px dashed rgba(0,240,255,0.45);
+            border-radius: 8px; color: #00f0ff; cursor: pointer; font-size: 0.92em;
+            transition: 0.2s; user-select: none;
         }
-        .hint {
-            color: #6b7a90;
-            font-size: 0.9em;
-            margin-top: 0.5em;
+        .img-btn:hover { background: rgba(0,240,255,0.08); box-shadow: 0 0 14px rgba(0,240,255,0.15); }
+        .img-previews { display: flex; gap: 0.7em; flex-wrap: wrap; margin-top: 0.8em; }
+        .img-previews .thumb {
+            position: relative; width: 96px; height: 96px; border-radius: 8px;
+            overflow: hidden; border: 1px solid rgba(0,240,255,0.25); background: #0d1220;
         }
-        .actions {
-            display: flex;
-            gap: 1em;
-            margin-top: 2em;
+        .img-previews .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .img-previews .thumb .rm {
+            position: absolute; top: 3px; right: 3px; width: 20px; height: 20px;
+            border-radius: 50%; background: rgba(0,0,0,0.65); color: #ff5f57;
+            border: none; cursor: pointer; font-size: 13px; line-height: 20px; text-align: center;
         }
-        .actions .btn {
-            width: auto;
-            padding: 0.8em 2em;
-        }
-        .preview {
-            margin-top: 2em;
-            padding: 1.5em;
-            background: #0d1220;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 240, 255, 0.1);
-        }
-        .preview h3 {
-            color: #00f0ff;
-            margin-bottom: 1em;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1em;
-        }
-        th, td {
-            padding: 0.8em;
-            text-align: left;
-            border-bottom: 1px solid rgba(0, 240, 255, 0.1);
-        }
-        th {
-            color: #00f0ff;
-        }
-        td a {
-            color: #00f0ff;
-            text-decoration: none;
-        }
-        td a:hover {
-            text-decoration: underline;
-        }
-        .status {
-            padding: 1em;
-            border-radius: 8px;
-            margin-bottom: 1em;
-        }
-        .status.success {
-            background: rgba(40, 200, 64, 0.1);
-            border: 1px solid rgba(40, 200, 64, 0.3);
-            color: #28c840;
-        }
-        .status.error {
-            background: rgba(255, 95, 87, 0.1);
-            border: 1px solid rgba(255, 95, 87, 0.3);
-            color: #ff5f57;
-        }
+        .img-previews .thumb .rm:hover { background: #ff5f57; color: #fff; }
+        .diary-preview { margin-top: 0.8em; }
+        .diary-preview img { max-width: 100%; border-radius: 8px; border: 1px solid rgba(0,240,255,0.2); }
+        .upload-tip { color: #6b7a90; font-size: 0.82em; margin-top: 0.5em; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>不语</h1>
-        <p class="subtitle">文章管理系统 - 本地版</p>
-        
+        <p class="subtitle">文章管理系统 · 写完后点「一键发布」，1-2 分钟后线上可见</p>
+
+        <div class="topbar">
+            <span class="badge" id="svc-badge">服务检测中...</span>
+            <span class="badge"><a id="online-link" href="#" target="_blank">🌐 线上博客</a></span>
+            <span class="badge" id="blog-dir">文章目录: -</span>
+        </div>
+
         <div class="grid">
             <div class="sidebar">
                 <h2>📁 操作</h2>
                 <button class="btn primary" onclick="newPost()">+ 新建文章</button>
-                <button class="btn" onclick="showPosts()">📄 文章列表</button>
+                <button class="btn" onclick="showList()">📄 文章列表</button>
+                <button class="btn" onclick="showStatusView()">📝 发状态</button>
+                <button class="btn diary" onclick="showDiaryView()">📔 日记</button>
                 <button class="btn" onclick="showHelp()">❓ 使用帮助</button>
-                <button class="btn" onclick="openBlog()">🌐 打开博客</button>
                 <hr style="border-color: rgba(0,240,255,0.1); margin: 1.5em 0;">
-                <h2>⚡ 快捷命令</h2>
+                <h2>💡 发布流程</h2>
                 <div class="hint">
-                    构建: npm run build<br>
-                    预览: npm run dev<br>
-                    文章目录: src/content/blog/
+                    1. 写文章 / 发状态<br>
+                    2. 点「一键发布」<br>
+                    3. GitHub 云端自动构建<br>
+                    4. 1-2 分钟后刷新线上博客
                 </div>
             </div>
-            
+
             <div class="main" id="main-content">
-                <div class="form-group">
-                    <label>文章标题</label>
-                    <input type="text" id="title" placeholder="输入文章标题...">
+                <div id="editor-view">
+                    <div class="view-title" id="editor-title">✍️ 写文章</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>文章标题</label>
+                            <input type="text" id="title" placeholder="输入文章标题...">
+                        </div>
+                        <div class="form-group">
+                            <label>发布日期 <span class="hint">(留空 = 今天)</span></label>
+                            <input type="date" id="pubDate">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>文章描述 <span class="hint">(博客列表页显示的一句话简介)</span></label>
+                        <input type="text" id="description" placeholder="简短描述文章内容...">
+                    </div>
+                    <div class="form-group">
+                        <label>正文 (Markdown)</label>
+                        <textarea id="content" placeholder="在这里写 Markdown 正文，无需写 frontmatter，系统会自动生成。&#10;&#10;## 二级标题&#10;&#10;- 列表项1&#10;- 列表项2&#10;&#10;**加粗文字**&#10;&#10;[链接文字](https://example.com)"></textarea>
+                    </div>
+                    <div class="actions">
+                        <button class="btn" id="btn-save" onclick="savePost(false)">💾 保存草稿</button>
+                        <button class="btn publish" id="btn-publish" onclick="savePost(true)">🚀 一键发布</button>
+                        <button class="btn" onclick="clearForm()">🗑️ 清空</button>
+                    </div>
+                    <div id="status"></div>
                 </div>
-                <div class="form-group">
-                    <label>文章描述</label>
-                    <input type="text" id="description" placeholder="简短描述文章内容...">
+
+                <div id="list-view" class="hidden">
+                    <div class="view-title">📄 文章列表</div>
+                    <table>
+                        <thead><tr><th>标题</th><th>发布日期</th><th>更新时间</th><th>操作</th></tr></thead>
+                        <tbody id="post-tbody"></tbody>
+                    </table>
+                    <div id="list-empty" class="empty hidden">还没有文章，点击左侧「新建文章」开始写作。</div>
                 </div>
-                <div class="form-group">
-                    <label>文章内容 (Markdown)</label>
-                    <textarea id="content" placeholder="在这里写 Markdown 内容...
 
-示例格式:
----
-title: '文章标题'
-description: '描述'
-pubDate: 2026-08-30
----
-
-这里是正文内容...
-
-## 二级标题
-
-- 列表项1
-- 列表项2
-
-**加粗文字**
-
-[链接文字](https://example.com)"></textarea>
-                    <div class="hint">支持标准 Markdown 语法，使用 --- 包裹 frontmatter</div>
+                <div id="status-view" class="hidden">
+                    <div class="view-title">📝 发状态</div>
+                    <div class="form-group">
+                        <label>状态内容 <span class="hint">(会显示在博客首页和生活圈)</span></label>
+                        <textarea class="short" id="status-content" placeholder="今天想说点什么..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>配图 <span class="hint">(可选，最多 9 张，每张 ≤ 8MB)</span></label>
+                        <div class="img-picker">
+                            <label class="img-btn" for="status-img-input">➕ 选择图片</label>
+                            <input type="file" id="status-img-input" accept="image/*" multiple>
+                            <span class="upload-tip" id="status-img-tip"></span>
+                        </div>
+                        <div class="img-previews" id="status-img-previews"></div>
+                    </div>
+                    <div class="actions">
+                        <button class="btn publish" onclick="postStatus()">📤 发布状态</button>
+                    </div>
+                    <div id="status-status"></div>
+                    <div class="view-title" style="margin-top:2em;">🕐 最近状态</div>
+                    <div id="status-list"></div>
                 </div>
-                <div class="actions">
-                    <button class="btn primary" onclick="savePost()">💾 保存文章</button>
-                    <button class="btn" onclick="previewPost()">👁️ 预览</button>
-                    <button class="btn" onclick="clearForm()">🗑️ 清空</button>
+
+                <div id="diary-view" class="hidden">
+                    <div id="diary-lock">
+                        <div class="view-title">📔 私人日记</div>
+                        <div class="pwd-box">
+                            <div class="form-group">
+                                <label>输入密码进入</label>
+                                <input type="password" id="diary-pwd" placeholder="****" onkeydown="if(event.key==='Enter')unlockDiary()">
+                            </div>
+                            <button class="btn primary" onclick="unlockDiary()">🔓 进入</button>
+                            <div class="hint" style="margin-top:1em;">日记只保存在本地电脑，不会发布到网上。</div>
+                        </div>
+                    </div>
+                    <div id="diary-editor" class="hidden">
+                        <div class="view-title">📔 私人日记</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>日期</label>
+                                <input type="date" id="diary-date" onchange="loadDiary()">
+                            </div>
+                            <div class="form-group">
+                                <label>日记内容 <span class="hint">(仅本地保存，不会发布)</span></label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="diary-content" placeholder="写下今天的心情..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>图片 <span class="hint">(仅本地保存，插入到日记中显示)</span></label>
+                            <div class="img-picker">
+                                <label class="img-btn" for="diary-img-input">➕ 上传图片</label>
+                                <input type="file" id="diary-img-input" accept="image/*">
+                                <span class="upload-tip" id="diary-img-tip"></span>
+                            </div>
+                            <div class="diary-preview" id="diary-preview"></div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn primary" onclick="saveDiary()">💾 保存日记</button>
+                        </div>
+                        <div id="diary-status"></div>
+                        <div class="diary-list">
+                            <div class="view-title">📚 日记列表</div>
+                            <table>
+                                <thead><tr><th>日期</th><th>摘要</th></tr></thead>
+                                <tbody id="diary-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-                <div id="status"></div>
+
+                <div id="help-view" class="hidden">
+                    <div class="view-title">❓ 使用帮助</div>
+                    <div class="hint" style="line-height: 2.2; font-size: 1em;">
+                        <h4 style="color:#eef3fa; margin: 0.8em 0;">写作与发布：</h4>
+                        <ol style="margin-left: 1.5em;">
+                            <li>点击「新建文章」，填写标题、描述和正文（纯 Markdown，不用写 frontmatter）</li>
+                            <li>「保存草稿」只保存到本地，不发布</li>
+                            <li>「一键发布」= 保存 + 推送到 GitHub，云端自动构建部署，1-2 分钟后线上可见</li>
+                            <li>修改旧文章：在「文章列表」中点击「编辑」，改完点「一键发布」即可更新</li>
+                        </ol>
+                        <h4 style="color:#eef3fa; margin: 0.8em 0;">发状态：</h4>
+                        <ul style="margin-left: 1.5em;">
+                            <li>点「发状态」输入内容、可选配图（最多 9 张），点发布，然后点「一键发布」推送到线上</li>
+                            <li>状态会显示在博客首页和生活圈（密码 0804），配图点击可放大</li>
+                        </ul>
+                        <h4 style="color:#eef3fa; margin: 0.8em 0;">日记：</h4>
+                        <ul style="margin-left: 1.5em;">
+                            <li>密码 0804（你的生日）进入</li>
+                            <li>只保存在本地 E:\不语\日记\，不会发布到网上</li>
+                            <li>可上传图片，自动插入到日记内容中，图片存在 E:\不语\日记\img\（仅本地）</li>
+                        </ul>
+                        <h4 style="color:#eef3fa; margin: 0.8em 0;">Markdown 语法：</h4>
+                        <ul style="margin-left: 1.5em;">
+                            <li># 一级标题, ## 二级标题, **加粗**, *斜体*, [链接](url), ![图片](url), `代码`</li>
+                            <li>- 列表项, 1. 有序列表</li>
+                        </ul>
+                        <h4 style="color:#eef3fa; margin: 0.8em 0;">图片：</h4>
+                        <p>把图片文件放到 <code>E:\不语\public\</code> 目录，然后在正文中用 <code>![描述](/图片名.png)</code> 引用。</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // 这里只是前端界面，实际保存需要后端支持
-        // 目前提供文章模板和格式检查
-        
-        function newPost() {
-            clearForm();
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('content').value = `---
-title: ''
-description: ''
-pubDate: ${today}
----
+        let currentSlug = null;   // 编辑中的文章 slug，null = 新文章
+        let busy = false;
 
-在这里开始写作...
-`;
+        // ---------- 通用 ----------
+        function showStatus(message, type, details) {
+            const el = document.getElementById('status');
+            el.className = 'status ' + (type || 'info');
+            let html = message;
+            if (details) {
+                html += '<pre>' + details.replace(/</g, '&lt;') + '</pre>';
+            }
+            el.innerHTML = html;
+            el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
-        
-        function clearForm() {
+
+        function setBusy(b) {
+            busy = b;
+            const bs = document.getElementById('btn-save');
+            const bp = document.getElementById('btn-publish');
+            if (bs) bs.disabled = b;
+            if (bp) bp.disabled = b;
+        }
+
+        async function api(url, options) {
+            const res = await fetch(url, options);
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.error || data.message || ('HTTP ' + res.status));
+            return data;
+        }
+
+        function esc(s) {
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        // ---------- 视图切换 ----------
+        function switchView(view) {
+            document.getElementById('editor-view').classList.toggle('hidden', view !== 'editor');
+            document.getElementById('list-view').classList.toggle('hidden', view !== 'list');
+            document.getElementById('status-view').classList.toggle('hidden', view !== 'status');
+            document.getElementById('diary-view').classList.toggle('hidden', view !== 'diary');
+            document.getElementById('help-view').classList.toggle('hidden', view !== 'help');
+        }
+
+        function newPost() {
+            currentSlug = null;
+            document.getElementById('editor-title').textContent = '✍️ 写文章';
             document.getElementById('title').value = '';
             document.getElementById('description').value = '';
             document.getElementById('content').value = '';
-            document.getElementById('status').innerHTML = '';
+            document.getElementById('pubDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('status').className = 'status';
+            switchView('editor');
+            document.getElementById('title').focus();
         }
-        
-        function previewPost() {
-            const content = document.getElementById('content').value;
-            if (!content.trim()) {
-                showStatus('请先输入内容', 'error');
-                return;
+
+        function clearForm() {
+            if (confirm('确定清空当前表单内容？')) {
+                document.getElementById('title').value = '';
+                document.getElementById('description').value = '';
+                document.getElementById('content').value = '';
+                document.getElementById('status').className = 'status';
             }
-            // 简单的 Markdown 预览（实际项目中可以用 marked.js）
-            showStatus('预览功能需要配置 Markdown 渲染器', 'error');
         }
-        
-        function savePost() {
-            const title = document.getElementById('title').value;
-            const description = document.getElementById('description').value;
-            const content = document.getElementById('content').value;
-            
-            if (!title.trim()) {
-                showStatus('请输入文章标题', 'error');
-                return;
+
+        function showHelp() { switchView('help'); }
+
+        // ---------- 保存 / 发布 ----------
+        async function savePost(publish) {
+            const title = document.getElementById('title').value.trim();
+            const content = document.getElementById('content').value.trim();
+            if (!title) { showStatus('请输入文章标题', 'error'); return; }
+            if (!content) { showStatus('请输入正文内容', 'error'); return; }
+
+            setBusy(true);
+            const btn = document.getElementById(publish ? 'btn-publish' : 'btn-save');
+            const oldText = btn.textContent;
+            btn.textContent = publish ? '⏳ 发布中...' : '⏳ 保存中...';
+
+            try {
+                const payload = {
+                    slug: currentSlug || undefined,
+                    title: title,
+                    description: document.getElementById('description').value.trim(),
+                    content: content,
+                    pubDate: document.getElementById('pubDate').value || undefined,
+                };
+                const saved = await api('/api/posts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                currentSlug = saved.slug;
+
+                if (!publish) {
+                    showStatus('✅ 草稿已保存到本地：src/content/blog/' + saved.filename, 'success');
+                    return;
+                }
+
+                showStatus('🚀 正在推送，请稍候...', 'info');
+                const pub = await api('/api/publish', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: title }),
+                });
+                let details = '';
+                if (pub.steps) {
+                    details = pub.steps.map(s => '[' + (s.ok ? '✓' : '✗') + '] ' + s.step + '\n  ' + (s.out || s.err || '')).join('\n');
+                }
+                if (pub.ok) {
+                    showStatus('✅ ' + pub.message, 'success', details);
+                } else {
+                    showStatus('❌ ' + pub.message, 'error', details);
+                }
+            } catch (e) {
+                showStatus('❌ 操作失败：' + e.message, 'error');
+            } finally {
+                setBusy(false);
+                btn.textContent = oldText;
             }
-            if (!content.trim()) {
-                showStatus('请输入文章内容', 'error');
-                return;
+        }
+
+        // ---------- 文章列表 ----------
+        async function showList() {
+            switchView('list');
+            const tbody = document.getElementById('post-tbody');
+            const empty = document.getElementById('list-empty');
+            tbody.innerHTML = '';
+            empty.classList.add('hidden');
+            try {
+                const posts = await api('/api/posts');
+                if (!posts.length) { empty.classList.remove('hidden'); return; }
+                posts.forEach(p => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = '<td><a href="#" onclick="event.preventDefault();editPost(\'' + p.slug + '\')">' + esc(p.title) + '</a></td>' +
+                        '<td>' + esc(p.pubDate || '-') + '</td>' +
+                        '<td>' + esc(p.updated || '-') + '</td>' +
+                        '<td>' +
+                        '<button class="op-btn" onclick="editPost(\'' + p.slug + '\')">✏️ 编辑</button>' +
+                        '<button class="op-btn pub" onclick="publishPost(\'' + p.slug + '\')">🚀 发布</button>' +
+                        '<button class="op-btn del" onclick="deletePost(\'' + p.slug + '\',\'' + esc(p.title).replace(/'/g, "\\'") + '\')">🗑️ 删除</button>' +
+                        '</td>';
+                    tbody.appendChild(tr);
+                });
+            } catch (e) {
+                showStatus('❌ 加载列表失败：' + e.message, 'error');
+                switchView('editor');
             }
-            
-            // 生成文件名
-            const filename = title.replace(/[^\w\u4e00-\u9fa5]/g, '-').toLowerCase() + '.md';
-            
-            // 显示保存信息（实际保存需要后端）
-            showStatus(`文章已准备好！<br>文件名: ${filename}<br><br>请手动保存到: E:\\不语\\src\\content\\blog\\${filename}<br><br>然后运行: npm run build`, 'success');
-            
-            // 复制内容到剪贴板
-            navigator.clipboard.writeText(content).then(() => {
-                console.log('内容已复制到剪贴板');
+        }
+
+        async function editPost(slug) {
+            try {
+                const data = await api('/api/posts/' + encodeURIComponent(slug));
+                const m = data.raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);
+                let body = data.raw, title = '', desc = '', pubDate = '';
+                if (m) {
+                    body = data.raw.slice(m[0].length);
+                    for (const line of m[1].split('\n')) {
+                        const i = line.indexOf(':');
+                        if (i < 0) continue;
+                        const k = line.slice(0, i).trim();
+                        const v = line.slice(i + 1).trim().replace(/^['"]|['"]$/g, '');
+                        if (k === 'title') title = v;
+                        else if (k === 'description') desc = v;
+                        else if (k === 'pubDate') pubDate = v;
+                    }
+                }
+                currentSlug = slug;
+                document.getElementById('editor-title').textContent = '✏️ 编辑：' + title;
+                document.getElementById('title').value = title;
+                document.getElementById('description').value = desc;
+                document.getElementById('pubDate').value = pubDate || new Date().toISOString().split('T')[0];
+                document.getElementById('content').value = body.trim();
+                document.getElementById('status').className = 'status';
+                switchView('editor');
+            } catch (e) {
+                showStatus('❌ 加载文章失败：' + e.message, 'error');
+            }
+        }
+
+        async function publishPost(slug) {
+            try {
+                const data = await api('/api/posts/' + encodeURIComponent(slug));
+                const m = data.raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);
+                let body = data.raw, title = '';
+                if (m) {
+                    body = data.raw.slice(m[0].length);
+                    const tm = m[1].match(/^title:\s*['"]?(.*?)['"]?\s*$/m);
+                    if (tm) title = tm[1];
+                }
+                await editPost(slug);
+                await savePost(true);
+            } catch (e) {
+                showStatus('❌ 发布失败：' + e.message, 'error');
+            }
+        }
+
+        async function deletePost(slug, title) {
+            if (!confirm('确定删除文章《' + title + '》？\n（仅删除本地文件，不会影响线上。）')) return;
+            try {
+                const res = await fetch('/api/posts/' + encodeURIComponent(slug), { method: 'DELETE' });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                showList();
+            } catch (e) {
+                showStatus('❌ 删除失败：' + e.message, 'error');
+            }
+        }
+
+        // ---------- 发状态 ----------
+        let statusImages = [];  // 已上传的状态图片 URL 列表
+
+        async function showStatusView() {
+            switchView('status');
+            document.getElementById('status-status').className = 'status';
+            try {
+                const list = await api('/api/statuses');
+                renderStatusList(list);
+            } catch (e) {
+                document.getElementById('status-status').className = 'status error';
+                document.getElementById('status-status').textContent = '❌ 加载状态失败：' + e.message;
+            }
+        }
+
+        function renderStatusList(list) {
+            const el = document.getElementById('status-list');
+            el.innerHTML = '';
+            if (!list.length) { el.innerHTML = '<div class="empty">还没有状态</div>'; return; }
+            list.slice().reverse().slice(-10).reverse().forEach(s => {
+                const d = document.createElement('div');
+                d.className = 'status-item';
+                let imgs = '';
+                if (s.images && s.images.length) {
+                    imgs = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">' +
+                        s.images.map(u => {
+                            const local = u.startsWith('/buyu/') ? '/api/status-img/' + u.split('/').pop() : u;
+                            return '<img src="' + esc(local) + '" style="width:72px;height:72px;object-fit:cover;border-radius:6px;border:1px solid rgba(0,240,255,0.2);">';
+                        }).join('') + '</div>';
+                }
+                d.innerHTML = '<div class="meta">' + esc(s.date) + ' ' + esc(s.time) + '</div><div>' + esc(s.content) + '</div>' + imgs;
+                el.appendChild(d);
             });
         }
-        
-        function showStatus(message, type) {
-            const status = document.getElementById('status');
-            status.className = `status ${type}`;
-            status.innerHTML = message;
+
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const fr = new FileReader();
+                fr.onload = () => resolve(fr.result);
+                fr.onerror = () => reject(new Error('读取文件失败'));
+                fr.readAsDataURL(file);
+            });
         }
-        
-        function showPosts() {
-            document.getElementById('main-content').innerHTML = `
-                <h3>📄 文章列表</h3>
-                <p class="hint">请查看文件夹: E:\\不语\\src\\content\\blog\\</p>
-                <p class="hint">或使用 VS Code 打开项目查看</p>
-            `;
+
+        // 选择状态图片 -> 本地预览（未上传）
+        document.getElementById('status-img-input').addEventListener('change', async function () {
+            const files = Array.from(this.files || []);
+            this.value = '';
+            if (!files.length) return;
+            if (statusImages.length + files.length > 9) {
+                alert('最多 9 张图片');
+                return;
+            }
+            const tip = document.getElementById('status-img-tip');
+            const previews = document.getElementById('status-img-previews');
+            try {
+                for (const f of files) {
+                    if (f.size > 8 * 1024 * 1024) { alert('图片过大：' + f.name + '（≤8MB）'); continue; }
+                    const dataUrl = await readFileAsDataURL(f);
+                    const thumb = document.createElement('div');
+                    thumb.className = 'thumb';
+                    thumb.innerHTML = '<img src="' + dataUrl + '"><button class="rm" title="移除">✕</button>';
+                    thumb.querySelector('.rm').onclick = () => {
+                        statusImages = statusImages.filter(x => x !== thumb._url);
+                        thumb.remove();
+                    };
+                    thumb._pending = { name: f.name, dataUrl: dataUrl };
+                    previews.appendChild(thumb);
+                }
+                tip.textContent = '已选择 ' + previews.children.length + ' 张，点「发布状态」时自动上传';
+            } catch (e) {
+                tip.textContent = '❌ ' + e.message;
+            }
+        });
+
+        async function postStatus() {
+            const content = document.getElementById('status-content').value.trim();
+            const previews = document.getElementById('status-img-previews');
+            const pending = Array.from(previews.querySelectorAll('.thumb')).filter(t => t._pending);
+            if (!content && !pending.length) {
+                const el = document.getElementById('status-status');
+                el.className = 'status error'; el.textContent = '请输入状态内容或选择图片';
+                return;
+            }
+            const tip = document.getElementById('status-img-tip');
+            tip.textContent = '⏳ 正在上传图片...';
+            try {
+                // 先上传所有待上传图片
+                for (const t of pending) {
+                    const b64 = t._pending.dataUrl.split(',')[1];
+                    const up = await api('/api/status-img', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ data: b64, filename: t._pending.name }),
+                    });
+                    statusImages.push(up.url);
+                    t._url = up.url;
+                    delete t._pending;
+                }
+                if (!content && !statusImages.length) {
+                    const el = document.getElementById('status-status');
+                    el.className = 'status error'; el.textContent = '请输入状态内容或选择图片';
+                    return;
+                }
+                await api('/api/statuses', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: content || '(图片状态)', images: statusImages }),
+                });
+                document.getElementById('status-content').value = '';
+                statusImages = [];
+                document.getElementById('status-img-previews').innerHTML = '';
+                tip.textContent = '';
+                const el = document.getElementById('status-status');
+                el.className = 'status success';
+                el.innerHTML = '✅ 状态已保存！点「🚀 一键发布」（文章页）或手动推送即可上线';
+                showStatusView();
+            } catch (e) {
+                const el = document.getElementById('status-status');
+                el.className = 'status error'; el.textContent = '❌ ' + e.message;
+                tip.textContent = '';
+            }
         }
-        
-        function showHelp() {
-            document.getElementById('main-content').innerHTML = `
-                <h3>❓ 使用帮助</h3>
-                <div class="hint">
-                    <h4>写作流程:</h4>
-                    <ol style="margin-left: 1.5em; line-height: 2;">
-                        <li>点击"新建文章"开始写作</li>
-                        <li>填写标题、描述和内容</li>
-                        <li>点击"保存文章"复制内容</li>
-                        <li>在 E:\\不语\\src\\content\\blog\\ 创建 .md 文件</li>
-                        <li>粘贴内容并保存</li>
-                        <li>运行 npm run build 重新构建</li>
-                        <li>刷新 http://localhost:8080 查看</li>
-                    </ol>
-                    <h4>Markdown 语法:</h4>
-                    <ul style="margin-left: 1.5em; line-height: 2;">
-                        <li># 一级标题, ## 二级标题</li>
-                        <li>**加粗**, *斜体*</li>
-                        <li>[链接](url), ![图片](url)</li>
-                        <li>\`代码\`, \`\`\`代码块\`\`\`</li>
-                        <li>- 列表项, 1. 有序列表</li>
-                    </ul>
-                </div>
-            `;
+
+        // ---------- 日记 ----------
+        function showDiaryView() {
+            switchView('diary');
+            const unlocked = sessionStorage.getItem('diary_ok') === '1';
+            document.getElementById('diary-lock').classList.toggle('hidden', unlocked);
+            document.getElementById('diary-editor').classList.toggle('hidden', !unlocked);
+            if (unlocked) initDiaryEditor();
+            else {
+                document.getElementById('diary-pwd').value = '';
+                document.getElementById('diary-pwd').focus();
+            }
         }
-        
-        function openBlog() {
-            window.open('http://localhost:8080', '_blank');
+
+        function unlockDiary() {
+            if (document.getElementById('diary-pwd').value === '0804') {
+                sessionStorage.setItem('diary_ok', '1');
+                document.getElementById('diary-lock').classList.add('hidden');
+                document.getElementById('diary-editor').classList.remove('hidden');
+                initDiaryEditor();
+            } else {
+                alert('密码错误，请重试（提示：作者生日）');
+            }
         }
-        
-        // 初始化
-        newPost();
+
+        function initDiaryEditor() {
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('diary-date');
+            if (!dateInput.value) dateInput.value = today;
+            loadDiary();
+        }
+
+        async function loadDiary() {
+            const date = document.getElementById('diary-date').value;
+            try {
+                const d = await api('/api/diary/' + date);
+                document.getElementById('diary-content').value = d.content;
+            } catch (e) { /* ignore */ }
+            renderDiaryPreview();
+            try {
+                const list = await api('/api/diary');
+                const tbody = document.getElementById('diary-tbody');
+                tbody.innerHTML = '';
+                list.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = '<td><a href="#" onclick="event.preventDefault();gotoDiary(\'' + item.date + '\')">' + esc(item.date) + '</a></td><td>' + esc(item.preview || '') + '</td>';
+                    tbody.appendChild(tr);
+                });
+            } catch (e) { /* ignore */ }
+        }
+
+        function gotoDiary(date) {
+            document.getElementById('diary-date').value = date;
+            loadDiary();
+        }
+
+        // 渲染日记内容里的图片引用（![](img/xxx.png) -> 本地预览）
+        function renderDiaryPreview() {
+            const content = document.getElementById('diary-content').value || '';
+            const box = document.getElementById('diary-preview');
+            box.innerHTML = '';
+            const re = /!\[[^\]]*\]\(img\/([^)\s]+)\)/g;
+            let m, found = false;
+            while ((m = re.exec(content)) !== null) {
+                found = true;
+                const img = document.createElement('img');
+                img.src = '/api/diary-img/' + encodeURIComponent(m[1]);
+                img.alt = m[1];
+                img.style.cssText = 'max-width:220px;margin:6px 8px 6px 0;border-radius:8px;border:1px solid rgba(0,240,255,0.2);';
+                box.appendChild(img);
+            }
+            if (found) box.style.display = 'block';
+            else box.style.display = 'none';
+        }
+
+        // 日记上传图片 -> 保存到本地 -> 插入 markdown 引用到正文
+        document.getElementById('diary-img-input').addEventListener('change', async function () {
+            const f = this.files && this.files[0];
+            this.value = '';
+            if (!f) return;
+            if (f.size > 8 * 1024 * 1024) { alert('图片过大（≤8MB）'); return; }
+            const tip = document.getElementById('diary-img-tip');
+            tip.textContent = '⏳ 上传中...';
+            try {
+                const dataUrl = await readFileAsDataURL(f);
+                const b64 = dataUrl.split(',')[1];
+                const date = document.getElementById('diary-date').value;
+                const up = await api('/api/diary-img', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: b64, filename: f.name, date: date }),
+                });
+                const ta = document.getElementById('diary-content');
+                const md = '\n\n' + up.markdown + '\n';
+                if (ta.value.trim()) ta.value += md;
+                else ta.value = up.markdown + '\n';
+                renderDiaryPreview();
+                tip.textContent = '✅ 已插入图片 ' + up.name;
+            } catch (e) {
+                tip.textContent = '❌ ' + e.message;
+            }
+        }
+
+        async function saveDiary() {
+            const date = document.getElementById('diary-date').value;
+            const content = document.getElementById('diary-content').value;
+            if (!date) { alert('请选择日期'); return; }
+            try {
+                await api('/api/diary', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ date: date, content: content }),
+                });
+                const el = document.getElementById('diary-status');
+                el.className = 'status success';
+                el.textContent = '✅ 日记已保存（仅本地 E:\\不语\\日记\\，不会发布到网上）';
+                loadDiary();
+            } catch (e) {
+                const el = document.getElementById('diary-status');
+                el.className = 'status error';
+                el.textContent = '❌ ' + e.message;
+            }
+        }
+
+        // ---------- 初始化 ----------
+        async function init() {
+            const badge = document.getElementById('svc-badge');
+            try {
+                const st = await api('/api/status');
+                badge.textContent = '● 服务运行中';
+                badge.classList.remove('offline');
+                document.getElementById('online-link').href = st.online_url;
+                document.getElementById('blog-dir').textContent = '文章目录: ' + st.blog_dir;
+            } catch (e) {
+                badge.textContent = '● 后端未连接';
+                badge.classList.add('offline');
+            }
+            newPost();
+        }
+
+        init();
     </script>
 </body>
 </html>
